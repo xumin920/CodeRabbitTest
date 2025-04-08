@@ -9,12 +9,21 @@ API_FLOWIQ_RECORDS_PATH = "/api/flowiq/records"
 
 def get_flowiq_for_last_xmins(tf, xmins):
     """
-    Returns a list of flowiq records as dicts from Copilot within the last x minutes,
-    netflow.gw_name (host gw) matching the gwname (if provided),
-    Uses the 'post' copilot API.
-    :param tf:
-    :param xmins: int, how many minutes in the past to filter on
-    :return: list of flow iq records as dicts from last xmins
+    Fetch flowiq records from the Copilot API within the last x minutes.
+    
+    This function asserts that the provided context contains an initialized Copilot API,
+    then constructs a payload with a date range spanning from the current time minus the
+    specified minutes until now. It sends a POST request to the API endpoint and returns
+    the parsed JSON response as a list of dictionaries representing flowiq records.
+    
+    Args:
+        xmins (int): The number of minutes in the past for which to retrieve records.
+    
+    Returns:
+        list: A list of dictionaries containing flowiq record data.
+    
+    Raises:
+        AssertionError: If the provided context lacks an initialized Copilot API.
     """
     assert tf.copilot_api is not None, "Missing tf.copilot_api in terraform!"
     payload = {
@@ -30,15 +39,20 @@ def get_flowiq_between_utc_datetimes(
     tf, earliest_datetime, latest_datetime, query_string=""
 ):
     """
-    Returns a list of flowiq records as dicts from Copilot
-    Uses the 'post' copilot API.
-    :param tf:
-    :param gwname: target gateway host name to filter on
-    :param earliest_datetime: datetime object
-    :param latest_datetime: datetime object
-    :param query_string: string used to further filter flow records
-                            '(geoip.as_org:"YAHOO-GQ1")'
-    :return: list of flow iq records as dicts matching the provided filter values
+    Retrieves flowiq records from the Copilot API between two UTC datetime values.
+    
+    This function posts a payload with a query string and a date range—formatted from the provided
+    earliest and latest datetime values—to retrieve flowiq records. It returns the matching records as a
+    list of dictionaries.
+    
+    Args:
+        earliest_datetime (datetime): The start of the date range.
+        latest_datetime (datetime): The end of the date range.
+        query_string (str, optional): Additional filter expression for flow records.
+            Defaults to an empty string.
+    
+    Returns:
+        list[dict]: A list of flowiq records matching the specified criteria.
     """
     assert tf.copilot_api is not None, "Missing tf.copilot_api in terraform!"
     gte = earliest_datetime.strftime("%Y-%m-%dT%H:%M:%S.000Z")
